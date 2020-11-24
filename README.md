@@ -1,5 +1,5 @@
 # Getting Started with Create React App
-# Author: Shaan Bhatt
+# Author: Shaan BhattLOLSTUPID
 # Author: Minwoo Soh
 # Author: Morgan Ling
 a change
