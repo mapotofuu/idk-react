@@ -1,6 +1,7 @@
 # Getting Started with Create React App
 # Author: Shaan Bhatt
 # Author: Minwoo Soh
+# Author: Morgan Ling
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
