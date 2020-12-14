@@ -22,24 +22,32 @@ class Form extends Component {
   }
 
   render() {
-    const { firstname, lastname } = this.state;
+    const { name, username, email } = this.state;
 
     return (
       <form>
-        <label htmlFor="firstname">First Name</label>
+        <label htmlFor="name">Name</label>
         <input
           type="text"
-          name="firstname"
-          id="lastname"
-          value={firstname}
+          name="name"
+          id="name"
+          value={name}
           onChange={this.handleChange}
         />
-        <label htmlFor="lastname">First Name</label>
+        <label htmlFor="username">Username</label>
         <input
           type="text"
-          name="lastname"
-          id="lastname"
-          value={lastname}
+          name="username"
+          id="username"
+          value={username}
+          onChange={this.handleChange}
+        />
+        <label htmlFor="email">Email</label>
+        <input
+          type="text"
+          name="email"
+          id="email"
+          value={email}
           onChange={this.handleChange}
         />
         <input

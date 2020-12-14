@@ -1,48 +1,42 @@
 import React, { Component } from 'react';
 import Table from './Table';
 import Form from './Form';
+const axios = require('axios');
 
 class App extends Component {
   state = {
-    names: [
-      {
-        firstname: 'mickey',
-        lastname: 'mouse',
-      },
-      {
-        firstname: 'donald',
-        lastname: 'duck',
-      },
-      {
-        firstname: 'goofy',
-        lastname: 'idontknowhislastname',
-      }
-    ]
+    users: []
   }
 
-  removeName = (index) => {
-    const {names} = this.state;
+  async componentDidMount() {
+    this.setState({
+      users: (await axios.get('https://jsonplaceholder.typicode.com/users')).data
+    })
+  }
+
+  removeUser = (index) => {
+    const {users} = this.state;
 
     this.setState({
-      names: names.filter((name, i) => {
+      users: users.filter((name, i) => {
         return i !== index
       }),
     })
   }
 
-  handleSubmit = (name) => {
+  handleSubmit = (user) => {
     this.setState({
-      names: [...this.state.names, name]
+      users: [...this.state.users, user]
     })
   }
 
   render() {
-    const { names } = this.state;
+    const { users } = this.state;
 
     return (
       <div className="container">
         <h1>Hi React, this is Morgan</h1>
-        <Table nameData={names} removeName={this.removeName} />
+        <Table userData={users} removeUser={this.removeUser} />
         <Form handleSubmit={this.handleSubmit} />
       </div>
     )
