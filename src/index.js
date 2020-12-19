@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
-import './index.css'
-import App from './App'
-//import App from './Api'
+//import './index.css'
+import './style.css'
+//import App from './App'
+import TextTyper from './TextTyper'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.render(<TextTyper />, document.getElementById('root'))
