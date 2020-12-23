@@ -8,13 +8,15 @@ class TextTyper extends Component {
         input: '',
         currentWord: 0,
         textDisplay: <span>nothing</span>,
-        //currentWordIndex: 0,
+        barClass: ""
     }
 
     setText = () => {
+        // reset values
         this.state.wordList = []
         this.state.currentWord = 0
         
+        // fill wordList with random words
         for(var i = 0; i < this.state.wordCount; i++)
         {
             var randomWord = this.state.randomWords[Math.floor(Math.random() * this.state.randomWords.length)]
@@ -22,37 +24,74 @@ class TextTyper extends Component {
             this.state.wordList.push(randomWord)
         }
 
+        // Display words on displaybox and store classNames into an array
         const newTextDisplay = this.state.wordList.map((word, index) => {
             return (
-                //<span key={index}>{word} </span>
-                <Text index={index} word={word}/>
+                <span key={index} className=''>{word} </span>
+                //<Text index={index} word={word}/>
             )
         })
+        // highlight first word
+        newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className='highlight'>{this.state.wordList[this.state.currentWord]} </span>
         
         this.setState({
+            textDisplay: newTextDisplay,
             input: '',
-            textDisplay: newTextDisplay
+            barClass: '',
         })
     }
 
     handleChange = (event) => {
         this.setState({input: event.target.value})
-        
-        var lastLetter = event.target.value.slice(-1)
-        if(lastLetter == ' ') // word complete
-        {
-            this.setState({input: ''})
 
-            if(this.state.input == this.state.wordList[this.state.currentWord]) // correct
+        // check if the typed letters match the current word so far
+        var currentWordSlice = this.state.wordList[this.state.currentWord].slice(0,event.target.value.length);
+        this.setState({
+            barClass: event.target.value === currentWordSlice ? '' : 'wrong'
+        })
+
+        // typed word is submitted once spacebar (' ') is pressed
+        var lastLetter = event.target.value.slice(-1)
+        if(lastLetter === ' ')
+        {
+            if(this.state.input === '') // nothing was typed out, ignore
             {
-                console.log("correct")
+                this.setState({
+                    input: '',
+                    barClass: ''
+                })
+                return
+            }
+
+            this.setState({
+                input: '',
+                barClass: ''
+            })
+
+            if(this.state.input === this.state.wordList[this.state.currentWord]) // correct
+            {
+                this.setHighlights('highlight correct')
             }
             else // wrong
             {
-                console.log("wrong")
+                this.setHighlights('highlight wrong')
             }
-            this.state.currentWord++ //next word
         }
+    }
+
+    setHighlights = (name) => {
+        const newTextDisplay = this.state.textDisplay
+        
+        // set className of typed out word to set correct or wrong highlight colors
+        newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className={name}>{this.state.wordList[this.state.currentWord]} </span>
+    
+        // next word
+        this.state.currentWord++
+        newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className='highlight'>{this.state.wordList[this.state.currentWord]} </span>
+    
+        this.setState({
+            textDisplay: newTextDisplay
+        })
     }
 
     componentDidMount()
@@ -62,6 +101,7 @@ class TextTyper extends Component {
 
     render() {
         const textDisplay = this.state.textDisplay
+        const barClass = this.state.barClass
         const input = this.state.input
 
         return (
@@ -81,7 +121,7 @@ class TextTyper extends Component {
                             autoCorrect="off" 
                             autoCapitalize="off" 
                             tabIndex="1" 
-                            className="" 
+                            className={barClass} 
                             style={barStyle} />
                         <button id="redo-button" onClick={this.setText} tabIndex="2">redo</button>
                     </div>
