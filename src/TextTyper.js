@@ -28,10 +28,10 @@ class TextTyper extends Component {
         const newTextDisplay = this.state.wordList.map((word, index) => {
             return (
                 <span key={index} className=''>{word} </span>
-                //<Text index={index} word={word}/>
             )
         })
-        // highlight first word
+
+        // Highlight first word
         newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className='highlight'>{this.state.wordList[this.state.currentWord]} </span>
         
         this.setState({
@@ -45,36 +45,41 @@ class TextTyper extends Component {
         this.setState({input: event.target.value})
 
         // check if the typed letters match the current word so far
-        var currentWordSlice = this.state.wordList[this.state.currentWord].slice(0,event.target.value.length);
-        this.setState({
-            barClass: event.target.value === currentWordSlice ? '' : 'wrong'
-        })
+        if(this.state.currentWord < this.state.wordList.length-1)
+        {
+            const currentWordSlice = this.state.wordList[this.state.currentWord].slice(0,event.target.value.length);
+            this.setState({
+                barClass: event.target.value === currentWordSlice ? '' : 'wrong'
+            })
+        }
 
         // typed word is submitted once spacebar (' ') is pressed
-        var lastLetter = event.target.value.slice(-1)
+        const lastLetter = event.target.value.slice(-1)
         if(lastLetter === ' ')
         {
-            if(this.state.input === '') // nothing was typed out, ignore
+            // if field was already empty or last word was already typed out, ignore.
+            if(this.state.input === '' || this.state.currentWord >= this.state.wordList.length)
             {
                 this.setState({
                     input: '',
                     barClass: ''
                 })
-                return
             }
-
-            this.setState({
-                input: '',
-                barClass: ''
-            })
-
-            if(this.state.input === this.state.wordList[this.state.currentWord]) // correct
+            else // word was typed out, determine if it matches current word
             {
-                this.setHighlights('highlight correct')
-            }
-            else // wrong
-            {
-                this.setHighlights('highlight wrong')
+                if(this.state.input === this.state.wordList[this.state.currentWord]) // correct
+                {
+                    this.setHighlights('highlight correct')
+                }
+                else // wrong
+                {
+                    this.setHighlights('highlight wrong')
+                }
+
+                this.setState({
+                    input: '',
+                    barClass: ''
+                })
             }
         }
     }
@@ -106,8 +111,14 @@ class TextTyper extends Component {
 
         return (
             <div id="command-center">
+                <div className='bar'>
+                    <div id="left-wing">
+                        <span id="word-count" style={{display: 'inline'}}>Wordcount: {this.state.wordCount}</span>
+                    </div>
+                    <div id="right-wing">WPM: N/A / ACC: N/A</div>
+                </div>
                 <div id="typing-area">
-                    <div id="text-display" style={textDisplayStyle}>
+                    <div id="text-display" style={{display: 'block', height: 'auto', direction: 'ltr'}}>
                         {textDisplay}
                     </div>
                     <div className="bar">
@@ -122,7 +133,7 @@ class TextTyper extends Component {
                             autoCapitalize="off" 
                             tabIndex="1" 
                             className={barClass} 
-                            style={barStyle} />
+                            style={{direction: 'ltr'}} />
                         <button id="redo-button" onClick={this.setText} tabIndex="2">redo</button>
                     </div>
                 </div>
@@ -131,19 +142,9 @@ class TextTyper extends Component {
     }
 }
 
-const Text = (props) => {
-    return (
-        <span key={props.index}>{props.word} </span>
-    )
-}
-
 const textDisplayStyle = {
     display: 'block',
     height: 'auto',
-    direction: 'ltr'
-}
-
-const barStyle = {
     direction: 'ltr'
 }
 
