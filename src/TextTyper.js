@@ -7,16 +7,20 @@ class TextTyper extends Component {
         wordList: [""],
         input: '',
         currentWord: 0,
-        textDisplay: <span>nothing</span>,
-        barClass: ""
+        correctKeys: 0,
+        barClass: "",
+        textDisplay: <span></span>,
+        results: "WPM: N/A / ACC: N/A",
+        startDate: 0
     }
 
     setText = () => {
-        // reset values
+        // Reset values
         this.state.wordList = []
         this.state.currentWord = 0
+        this.state.correctKeys = 0
         
-        // fill wordList with random words
+        // Fill wordList with random words
         for(var i = 0; i < this.state.wordCount; i++)
         {
             var randomWord = this.state.randomWords[Math.floor(Math.random() * this.state.randomWords.length)]
@@ -42,9 +46,16 @@ class TextTyper extends Component {
     }
 
     handleChange = (event) => {
+        // Timer starts once first character is typed.
+        if(this.state.currentWord === 0 && this.state.input === '')
+        {
+            this.state.startDate = Date.now()
+            console.log("First letter typed. Starting timer.")
+        }
+
         this.setState({input: event.target.value})
 
-        // check if the typed letters match the current word so far
+        // Check if the typed letters match the current word so far
         if(this.state.currentWord < this.state.wordList.length-1)
         {
             const currentWordSlice = this.state.wordList[this.state.currentWord].slice(0,event.target.value.length);
@@ -53,11 +64,11 @@ class TextTyper extends Component {
             })
         }
 
-        // typed word is submitted once spacebar (' ') is pressed
+        // Typed word is submitted once spacebar (' ') is pressed
         const lastLetter = event.target.value.slice(-1)
         if(lastLetter === ' ')
         {
-            // if field was already empty or last word was already typed out, ignore.
+            // If field was already empty or last word was already typed out, ignore.
             if(this.state.input === '' || this.state.currentWord >= this.state.wordList.length)
             {
                 this.setState({
@@ -65,17 +76,31 @@ class TextTyper extends Component {
                     barClass: ''
                 })
             }
-            else // word was typed out, determine if it matches current word
+            else
             {
-                if(this.state.input === this.state.wordList[this.state.currentWord]) // correct
+                // A word was fully typed out, determine if it matches current word.
+                if(this.state.input === this.state.wordList[this.state.currentWord]) // Correct
                 {
+                    this.state.correctKeys += this.state.wordList[this.state.currentWord].length + 1
                     this.setHighlights('highlight correct')
                 }
-                else // wrong
+                else // Wrong
                 {
                     this.setHighlights('highlight wrong')
                 }
-
+                
+                // Check if last typed word was the last. If not, move to next word.
+                if(this.state.currentWord === this.state.wordList.length - 1) // last word typed
+                {
+                    this.showResults()
+                }
+                else // not last word yet, move to next word and highlight it
+                {
+                    this.state.currentWord++
+                    this.setHighlights('highlight')
+                }
+                
+                // Clear input field for next word.
                 this.setState({
                     input: '',
                     barClass: ''
@@ -87,23 +112,35 @@ class TextTyper extends Component {
     setHighlights = (name) => {
         const newTextDisplay = this.state.textDisplay
         
-        // set className of typed out word to set correct or wrong highlight colors
+        // Set className of typed out word to set correct or wrong highlight colors
         newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className={name}>{this.state.wordList[this.state.currentWord]} </span>
-    
-        // next word
-        this.state.currentWord++
-        newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className='highlight'>{this.state.wordList[this.state.currentWord]} </span>
     
         this.setState({
             textDisplay: newTextDisplay
         })
     }
 
-    setWordCount = (count) =>
-    {
+    setWordCount = (count) => {
         this.state.wordCount = count
         //console.log("New word count: " + count)
         this.setText()
+    }
+
+    showResults = () => {
+        console.log("All words typed out. Showing results.")
+        let words, minute, acc
+
+        words = this.state.correctKeys / 5
+        minute = (Date.now() - this.state.startDate) / 1000 / 60
+        let totalKeys = -1
+        this.state.wordList.forEach(word => {
+            totalKeys += word.length + 1
+        });
+        acc = Math.floor((this.state.correctKeys / totalKeys) * 100)
+
+        let wpm = Math.floor(words / minute)
+
+        this.setState({ results: "WPM: " + wpm + " / ACC: " + acc})
     }
 
     componentDidMount()
@@ -115,6 +152,7 @@ class TextTyper extends Component {
         const textDisplay = this.state.textDisplay
         const barClass = this.state.barClass
         const input = this.state.input
+        const results = this.state.results
 
         return (
             <div id="command-center">
@@ -130,7 +168,7 @@ class TextTyper extends Component {
                             <span id="wc-100" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(100)}>100</span>
                         </span>
                     </div>
-                    <div id="right-wing">WPM: N/A / ACC: N/A</div>
+                    <div id="right-wing">{results}</div>
                 </div>
                 <div id="typing-area">
                     <div id="text-display" style={{display: 'block', height: 'auto', direction: 'ltr'}}>
@@ -157,10 +195,12 @@ class TextTyper extends Component {
     }
 }
 
+/*
 const textDisplayStyle = {
     display: 'block',
     height: 'auto',
     direction: 'ltr'
 }
+*/
 
 export default TextTyper
