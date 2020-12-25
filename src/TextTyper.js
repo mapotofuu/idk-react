@@ -99,6 +99,13 @@ class TextTyper extends Component {
         })
     }
 
+    setWordCount = (count) =>
+    {
+        this.state.wordCount = count
+        //console.log("New word count: " + count)
+        this.setText()
+    }
+
     componentDidMount()
     {
         this.setText()
@@ -113,7 +120,15 @@ class TextTyper extends Component {
             <div id="command-center">
                 <div className='bar'>
                     <div id="left-wing">
-                        <span id="word-count" style={{display: 'inline'}}>Wordcount: {this.state.wordCount}</span>
+                        <span id="word-count" style={{display: 'inline'}}>
+                            <span id="wc-10" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(10)}>10</span>
+                            <span> / </span>
+                            <span id="wc-25" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(25)}>25</span>
+                            <span> / </span>
+                            <span id="wc-50" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(50)}>50</span>
+                            <span> / </span>
+                            <span id="wc-100" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(100)}>100</span>
+                        </span>
                     </div>
                     <div id="right-wing">WPM: N/A / ACC: N/A</div>
                 </div>
