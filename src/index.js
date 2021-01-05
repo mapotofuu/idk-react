@@ -4,5 +4,6 @@ import ReactDOM from 'react-dom'
 import './style.css'
 //import App from './App'
 import TextTyper from './TextTyper'
+import CodeTyper from './CodeTyper'
 
-ReactDOM.render(<TextTyper />, document.getElementById('root'))
+ReactDOM.render(<CodeTyper />, document.getElementById('root'))

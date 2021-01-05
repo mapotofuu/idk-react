@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
+import { CodeBlock, dracula } from "react-code-blocks";
 
-class TextTyper extends Component {
+class CodeTyper extends Component {
     state = {
         randomWords: ["the", "be", "of", "and", "a", "to", "in", "he", "have", "it", "that", "for", "they", "I", "with", "as", "not", "on", "she", "at", "by", "this", "we", "you", "do", "but", "from", "or", "which", "one", "would", "all", "will", "there", "say", "who", "make", "when", "can", "more", "if", "no", "man", "out", "other", "so", "what", "time", "up", "go", "about", "than", "into", "could", "state", "only", "new", "year", "some", "take", "come", "these", "know", "see", "use", "get", "like", "then", "first", "any", "work", "now", "may", "such", "give", "over", "think", "most", "even", "find", "day", "also", "after", "way", "many", "must", "look", "before", "great", "back", "through", "long", "where", "much", "should", "well", "people", "down", "own", "just", "because", "good", "each", "those", "feel", "seem", "how", "high", "too", "place", "little", "world", "very", "still", "nation", "hand", "old", "life", "tell", "write", "become", "here", "show", "house", "both", "between", "need", "mean", "call", "develop", "under", "last", "right", "move", "thing", "general", "school", "never", "same", "another", "begin", "while", "number", "part", "turn", "real", "leave", "might", "want", "point", "form", "off", "child", "few", "small", "since", "against", "ask", "late", "home", "interest", "large", "person", "end", "open", "public", "follow", "during", "present", "without", "again", "hold", "govern", "around", "possible", "head", "consider", "word", "program", "problem", "however", "lead", "system", "set", "order", "eye", "plan", "run", "keep", "face", "fact", "group", "play", "stand", "increase", "early", "course", "change", "help", "line"],
         wordCount: 25,
@@ -10,9 +11,14 @@ class TextTyper extends Component {
         correctKeys: 0,
         barClass: "",
         textDisplay: <span> {'{Insert random words here}'} </span>,
-        textDisplayClasses: [],
         results: "WPM: XX / ACC: XX",
-        startDate: 0
+        startDate: 0,
+        sampleText: 
+`class HelloWorld {
+  static public void main( String args[] ) {
+    System.out.println( "Hello World!" );
+  }
+}`
     }
 
     setText = () => {
@@ -20,36 +26,54 @@ class TextTyper extends Component {
         this.state.wordList = []
         this.state.currentWord = 0
         this.state.correctKeys = 0
-        this.textDisplayClasses = []
         
-        // Fill wordList with random words
-        for(var i = 0; i < this.state.wordCount; i++)
-        {
-            var randomWord = this.state.randomWords[Math.floor(Math.random() * this.state.randomWords.length)]
-            //this.state.wordList = [...this.state.wordList, randomWord]
-            this.state.wordList.push(randomWord)
-        }
+        // Split text by punctations and whitespaces
+        //this.state.wordList = this.state.sampleText.split(/\b/)
+        //this.state.wordList = this.state.sampleText.split(/\s*\b\s*/)
+        this.state.wordList = this.state.sampleText.match(/[\w-]+|[^\w\s]/g)
+
+        var tabAmount = 0
 
         // Display words on displaybox and store classNames into an array
         const newTextDisplay = this.state.wordList.map((word, index) => {
-            this.state.textDisplayClasses.push('')
+            var returnElement
+            var spaceAmount = ''
+            
+            if(word ===  '}')
+            {
+                tabAmount --
+            }
 
+            // Only for new lines
+            for(var i = 0; i < tabAmount; i++)
+            {
+                spaceAmount += "  "
+            }
+
+            if(word ===  '{')
+            {
+                tabAmount ++
+            }
+
+            returnElement = <span key={index} className=''>{spaceAmount + word}</span>
+
+            return returnElement
+
+            /*
             return (
-                //<span key={index} className=''>{word} </span>
-                <span key={index} className={this.state.textDisplayClasses[index]}>{word} </span>
+                <span key={index} className=''>{word} </span>
             )
+            */
         })
 
         // Highlight first word
-        //newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className='highlight'>{this.state.wordList[this.state.currentWord]} </span>
+        newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className='highlight'>{this.state.wordList[this.state.currentWord]} </span>
         
         this.setState({
             textDisplay: newTextDisplay,
             input: '',
             barClass: '',
         })
-
-        this.setHighlights('highlight')
     }
 
     handleChange = (event) => {
@@ -117,7 +141,6 @@ class TextTyper extends Component {
     }
 
     setHighlights = (name) => {
-        /*
         const newTextDisplay = this.state.textDisplay
         
         // Set className of typed out word to set correct or wrong highlight colors
@@ -126,29 +149,6 @@ class TextTyper extends Component {
         this.setState({
             textDisplay: newTextDisplay
         })
-        */
-
-       const newTextDisplayClasses = this.state.textDisplayClasses
-        
-       // Set className of typed out word to set correct or wrong highlight colors
-       newTextDisplayClasses[this.state.currentWord] = name
-
-       const newTextDisplay = this.state.wordList.map((word, index) => {
-            return (
-                <span key={index} className={this.state.textDisplayClasses[index]}>{word} </span>
-            )
-        })
-   
-       this.setState({
-           textDisplayClasses: newTextDisplayClasses,
-           textDisplay: newTextDisplay
-       })
-    }
-
-    setWordCount = (count) => {
-        this.state.wordCount = count
-        //console.log("New word count: " + count)
-        this.setText()
     }
 
     showResults = () => {
@@ -168,6 +168,10 @@ class TextTyper extends Component {
         this.setState({ results: "WPM: " + wpm + " / ACC: " + acc})
     }
 
+    clickedOn = () => {
+        console.log("Element clicked")
+    }
+
     componentDidMount()
     {
         this.setText()
@@ -184,23 +188,23 @@ class TextTyper extends Component {
                 <div className='bar'>
                     <div id="left-wing">
                         <span id="word-count" style={{display: 'inline'}}>
-                            <span id="wc-10" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(10)}>10</span>
-                            <span> / </span>
-                            <span id="wc-25" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(25)}>25</span>
-                            <span> / </span>
-                            <span id="wc-50" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(50)}>50</span>
-                            <span> / </span>
-                            <span id="wc-100" style={{cursor: 'pointer'}} onClick={() => this.setWordCount(100)}>100</span>
+                            <span id="wc-10" style={{cursor: 'pointer'}} onClick={() => this.clickedOn()}>Java</span>
                         </span>
                     </div>
                     <div id="right-wing">{results}</div>
                 </div>
-                <div id="typing-area">
-                    <div id="text-display" style={{display: 'block', height: 'auto', direction: 'ltr'}}>
-                        {textDisplay}
+                <div id="typing-area" className="row">
+                    <div className="column">
+                        <CodeBlock 
+                            language="java"
+                            text={this.state.sampleText}
+                            showLineNumbers={true}
+                            theme={dracula}
+                            wrapLines={false}
+                        />
                     </div>
-                    <div className="bar">
-                        <input 
+                    <div className="text-field column">
+                        <textarea 
                             id="input-field" 
                             value={input}
                             onChange={this.handleChange} 
@@ -212,12 +216,33 @@ class TextTyper extends Component {
                             tabIndex="1" 
                             className={barClass} 
                             style={{direction: 'ltr'}} />
-                        <button id="redo-button" onClick={this.setText} tabIndex="2">redo</button>
                     </div>
                 </div>
+                <button id="redo-button" onClick={this.setText} tabIndex="2">redo</button>
             </div>
         )
     }
+}
+
+const codeStyle = {
+    padding: '8px',
+    fontSize: 'inherit',
+    fontFamily: 'inherit',
+    lineHight: 1.42857,
+    color: 'white',
+    whiteSpace: 'pre'
+}
+
+const codeBlock = {
+    fontSize: 'inherit',
+    fontFamily: 'inherit',
+    background: 'rgb(40, 42, 54)',
+    color: 'rgb(248, 248, 242)',
+    borderRadius: '3px',
+    display: 'flex',
+    lineHeight: 1.42857,
+    overflowX: 'auto',
+    whiteSpace: 'pre'
 }
 
 /*
@@ -228,4 +253,4 @@ const textDisplayStyle = {
 }
 */
 
-export default TextTyper
+export default CodeTyper

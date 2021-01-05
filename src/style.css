@@ -5,7 +5,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* align-items: center; */
   justify-content: space-between;
   font-family: Roboto Mono;
   line-height: 1.6rem;
@@ -20,20 +20,23 @@ body {
   justify-content: space-between;
 }
 
+.text-field {
+  display: flex;
+}
+
 #header {
-  margin: 0;
-  margin: 1.2rem 0 0 0;
+  margin: 1.2rem auto 1.2rem;
   line-height: 2rem;
 }
 
 #command-center {
   margin: 0 0.4rem;
-  width: 100%;
-  max-width: 40rem;
+  width: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   transform: translateY(-2vh);
+  padding: 1rem;
 }
 
 #theme-area{
@@ -92,10 +95,10 @@ body {
   padding: 0.4rem 1rem;
   border-radius: 0.2rem;
   font-size: 1.2rem;
+  resize: none;
 }
 
 #redo-button {
-  margin-left: 0.7rem;
   border: none;
   font: inherit;
   padding: 0.4rem 1rem;
@@ -105,7 +108,8 @@ body {
 }
 
 #footer {
-  margin-bottom: 1.2rem;
+  /*margin-bottom: 1.2rem;*/
+  margin: 0 auto 1.2rem;
   display: flex;
 }
 
@@ -131,6 +135,17 @@ body, #header, #left-wing, #right-wing, #typing-area, #theme-area, #theme-center
 #text-display, #redo-button, #footer, #highlight {
   transition: all .4s ease-in-out 0s;
 
+}
+
+/* TEST DO NOT USE FOR NORMAL TEXT TYPER */
+.row {
+  display: flex;
+  flex: 1 0 auto;
+}
+
+.column {
+  flex: 50%;
+  margin: 0 0.5rem;
 }
 
 
