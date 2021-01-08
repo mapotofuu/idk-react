@@ -1,16 +1,19 @@
 import React, {Component} from 'react'
+
+// Components
 import { CodeBlock, dracula } from "react-code-blocks";
+import CodeEditor from './CodeEditor';
+import { HighlightWithinTextarea } from 'react-highlight-within-textarea';
+
 
 class CodeTyper extends Component {
     state = {
-        randomWords: ["the", "be", "of", "and", "a", "to", "in", "he", "have", "it", "that", "for", "they", "I", "with", "as", "not", "on", "she", "at", "by", "this", "we", "you", "do", "but", "from", "or", "which", "one", "would", "all", "will", "there", "say", "who", "make", "when", "can", "more", "if", "no", "man", "out", "other", "so", "what", "time", "up", "go", "about", "than", "into", "could", "state", "only", "new", "year", "some", "take", "come", "these", "know", "see", "use", "get", "like", "then", "first", "any", "work", "now", "may", "such", "give", "over", "think", "most", "even", "find", "day", "also", "after", "way", "many", "must", "look", "before", "great", "back", "through", "long", "where", "much", "should", "well", "people", "down", "own", "just", "because", "good", "each", "those", "feel", "seem", "how", "high", "too", "place", "little", "world", "very", "still", "nation", "hand", "old", "life", "tell", "write", "become", "here", "show", "house", "both", "between", "need", "mean", "call", "develop", "under", "last", "right", "move", "thing", "general", "school", "never", "same", "another", "begin", "while", "number", "part", "turn", "real", "leave", "might", "want", "point", "form", "off", "child", "few", "small", "since", "against", "ask", "late", "home", "interest", "large", "person", "end", "open", "public", "follow", "during", "present", "without", "again", "hold", "govern", "around", "possible", "head", "consider", "word", "program", "problem", "however", "lead", "system", "set", "order", "eye", "plan", "run", "keep", "face", "fact", "group", "play", "stand", "increase", "early", "course", "change", "help", "line"],
-        wordCount: 25,
         wordList: [""],
         input: '',
+        correctKeys: '',
+        highlight: [0, 5],
         currentWord: 0,
-        correctKeys: 0,
-        barClass: "",
-        textDisplay: <span> {'{Insert random words here}'} </span>,
+        inputClass: "",
         results: "WPM: XX / ACC: XX",
         startDate: 0,
         sampleText: 
@@ -18,137 +21,64 @@ class CodeTyper extends Component {
   static public void main( String args[] ) {
     System.out.println( "Hello World!" );
   }
-}`
+}
+
+class HelloWorld {
+  static public void main( String args[] ) {
+    System.out.println( "Hello World!" );
+  }
+}
+
+const something = 10;`
     }
 
     setText = () => {
         // Reset values
         this.state.wordList = []
         this.state.currentWord = 0
-        this.state.correctKeys = 0
+        this.state.correctKeys = ''
         
         // Split text by punctations and whitespaces
-        //this.state.wordList = this.state.sampleText.split(/\b/)
-        //this.state.wordList = this.state.sampleText.split(/\s*\b\s*/)
+        // [\w-]+ means any word/letters including '-'
+        // [^\w\s] means any characters that are not words/letters or whitespaces, so any remaining punctuations.
         this.state.wordList = this.state.sampleText.match(/[\w-]+|[^\w\s]/g)
-
-        var tabAmount = 0
-
-        // Display words on displaybox and store classNames into an array
-        const newTextDisplay = this.state.wordList.map((word, index) => {
-            var returnElement
-            var spaceAmount = ''
-            
-            if(word ===  '}')
-            {
-                tabAmount --
-            }
-
-            // Only for new lines
-            for(var i = 0; i < tabAmount; i++)
-            {
-                spaceAmount += "  "
-            }
-
-            if(word ===  '{')
-            {
-                tabAmount ++
-            }
-
-            returnElement = <span key={index} className=''>{spaceAmount + word}</span>
-
-            return returnElement
-
-            /*
-            return (
-                <span key={index} className=''>{word} </span>
-            )
-            */
-        })
-
-        // Highlight first word
-        newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className='highlight'>{this.state.wordList[this.state.currentWord]} </span>
         
         this.setState({
-            textDisplay: newTextDisplay,
             input: '',
-            barClass: '',
+            inputClass: '',
         })
     }
 
     handleChange = (event) => {
-        // Timer starts once first character is typed.
-        if(this.state.currentWord === 0 && this.state.input === '')
-        {
-            this.state.startDate = Date.now()
-            console.log("First letter typed. Starting timer.")
-        }
+        if(this.state.sampleText == this.state.input) // Text fully typed out correctly. Stop timer.
+            return;
 
-        this.setState({input: event.target.value})
-
-        // Check if the typed letters match the current word so far
-        if(this.state.currentWord < this.state.wordList.length-1)
+        // If the length of current input with mistake is longer than length of correct keys, do not allow user to continue typing until mistake is fixed.
+        if(event.target.value.length < this.state.correctKeys.length + 6)
         {
-            const currentWordSlice = this.state.wordList[this.state.currentWord].slice(0,event.target.value.length);
-            this.setState({
-                barClass: event.target.value === currentWordSlice ? '' : 'wrong'
-            })
-        }
+            this.setState({input: event.target.value})
 
-        // Typed word is submitted once spacebar (' ') is pressed
-        const lastLetter = event.target.value.slice(-1)
-        if(lastLetter === ' ')
-        {
-            // If field was already empty or last word was already typed out, ignore.
-            if(this.state.input === '' || this.state.currentWord >= this.state.wordList.length)
+            const currentSlice = this.state.sampleText.slice(0,event.target.value.length);
+
+            if(event.target.value === currentSlice)
             {
                 this.setState({
-                    input: '',
-                    barClass: ''
+                    correctKeys: event.target.value,
+                    highlight: [0, 0]
                 })
             }
             else
             {
-                // A word was fully typed out, determine if it matches current word.
-                if(this.state.input === this.state.wordList[this.state.currentWord]) // Correct
-                {
-                    this.state.correctKeys += this.state.wordList[this.state.currentWord].length + 1
-                    this.setHighlights('highlight correct')
-                }
-                else // Wrong
-                {
-                    this.setHighlights('highlight wrong')
-                }
-                
-                // Check if last typed word was the last. If not, move to next word.
-                if(this.state.currentWord === this.state.wordList.length - 1) // last word typed
-                {
-                    this.showResults()
-                }
-                else // not last word yet, move to next word and highlight it
-                {
-                    this.state.currentWord++
-                    this.setHighlights('highlight')
-                }
-                
-                // Clear input field for next word.
                 this.setState({
-                    input: '',
-                    barClass: ''
+                    highlight: [this.state.correctKeys.length, event.target.value.length]
                 })
             }
         }
+        
     }
 
-    setHighlights = (name) => {
-        const newTextDisplay = this.state.textDisplay
-        
-        // Set className of typed out word to set correct or wrong highlight colors
-        newTextDisplay[this.state.currentWord] = <span key={this.state.currentWord} className={name}>{this.state.wordList[this.state.currentWord]} </span>
-    
-        this.setState({
-            textDisplay: newTextDisplay
-        })
+    handleKeyDown = (event) => {
+
     }
 
     showResults = () => {
@@ -179,9 +109,26 @@ class CodeTyper extends Component {
 
     render() {
         const textDisplay = this.state.textDisplay
-        const barClass = this.state.barClass
+        const inputClass = this.state.inputClass
         const input = this.state.input
         const results = this.state.results
+
+        const defaultCodeEditor = 
+        <textarea 
+        id="input-field" 
+        value={input}
+        onChange={this.handleChange} 
+        onKeyDown={this.handleChange}
+        type="text" 
+        spellCheck="false" 
+        autoComplete="off" 
+        autoCorrect="off" 
+        autoCapitalize="off"
+        tabIndex="1" 
+        className={inputClass} 
+        style={{direction: 'ltr'}}
+        >
+        </textarea>
 
         return (
             <div id="command-center">
@@ -200,22 +147,26 @@ class CodeTyper extends Component {
                             text={this.state.sampleText}
                             showLineNumbers={true}
                             theme={dracula}
-                            wrapLines={false}
+                            wrapLines={true}
                         />
                     </div>
-                    <div className="text-field column">
-                        <textarea 
-                            id="input-field" 
+                    <div className="column">
+                        <HighlightWithinTextarea
                             value={input}
-                            onChange={this.handleChange} 
-                            type="text" 
+                            highlight={this.state.highlight}
+                            onChange={this.handleChange}
+                            containerClassName="highlighttext-within-textarea"
+
+                            id="input-field"
                             spellCheck="false" 
                             autoComplete="off" 
                             autoCorrect="off" 
-                            autoCapitalize="off" 
+                            autoCapitalize="off"
                             tabIndex="1" 
-                            className={barClass} 
-                            style={{direction: 'ltr'}} />
+                            className={inputClass} 
+                            style={{direction: 'ltr'}}
+                            placeholder="Start typing!"
+                        />
                     </div>
                 </div>
                 <button id="redo-button" onClick={this.setText} tabIndex="2">redo</button>
@@ -244,13 +195,5 @@ const codeBlock = {
     overflowX: 'auto',
     whiteSpace: 'pre'
 }
-
-/*
-const textDisplayStyle = {
-    display: 'block',
-    height: 'auto',
-    direction: 'ltr'
-}
-*/
 
 export default CodeTyper
