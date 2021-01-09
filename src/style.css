@@ -107,8 +107,6 @@ body {
   padding: 8px 0px 8px 10px;
   border-radius: 0.2rem;
   resize: none;
-
-  background: #2c2e40;
 }
 
 .highlighttext-within-textarea {
@@ -119,11 +117,14 @@ body {
   resize: none;
   font-size: inherit;
   line-height: 1.66667;
+
+  background: #2c2e40;
 }
 
 mark {
   background: rgba(254, 73, 78, 0.3);
 }
+
 
 #redo-button {
   border: none;

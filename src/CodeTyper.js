@@ -2,34 +2,33 @@ import React, {Component} from 'react'
 
 // Components
 import { CodeBlock, dracula } from "react-code-blocks";
-import CodeEditor from './CodeEditor';
 import { HighlightWithinTextarea } from 'react-highlight-within-textarea';
 
+// Used as enums
+const conditions = {
+    notStarted: 'notStarted',
+    typing: 'typing',
+    finished: 'finished'
+}
 
 class CodeTyper extends Component {
     state = {
         wordList: [""],
         input: '',
         correctKeys: '',
+        totalKeysCount: 0,
         highlight: [0, 5],
         currentWord: 0,
         inputClass: "",
         results: "WPM: XX / ACC: XX",
         startDate: 0,
-        sampleText: 
+        typingState: '',
+        codeText: 
 `class HelloWorld {
   static public void main( String args[] ) {
     System.out.println( "Hello World!" );
   }
-}
-
-class HelloWorld {
-  static public void main( String args[] ) {
-    System.out.println( "Hello World!" );
-  }
-}
-
-const something = 10;`
+}`
     }
 
     setText = () => {
@@ -37,11 +36,13 @@ const something = 10;`
         this.state.wordList = []
         this.state.currentWord = 0
         this.state.correctKeys = ''
+        this.state.totalKeysCount = 0
+        this.state.typingState = conditions.notStarted
         
         // Split text by punctations and whitespaces
         // [\w-]+ means any word/letters including '-'
         // [^\w\s] means any characters that are not words/letters or whitespaces, so any remaining punctuations.
-        this.state.wordList = this.state.sampleText.match(/[\w-]+|[^\w\s]/g)
+        this.state.wordList = this.state.codeText.match(/[\w-]+|[^\w\s]/g)
         
         this.setState({
             input: '',
@@ -50,48 +51,91 @@ const something = 10;`
     }
 
     handleChange = (event) => {
-        if(this.state.sampleText == this.state.input) // Text fully typed out correctly. Stop timer.
-            return;
-
-        // If the length of current input with mistake is longer than length of correct keys, do not allow user to continue typing until mistake is fixed.
-        if(event.target.value.length < this.state.correctKeys.length + 6)
+        //console.log(event.target.value)
+        if(this.state.typingState === conditions.notStarted)
         {
-            this.setState({input: event.target.value})
+            this.state.startDate = Date.now()
+            console.log("First letter typed. Starting timer.")
+            this.state.typingState = conditions.typing
+        }
 
-            const currentSlice = this.state.sampleText.slice(0,event.target.value.length);
-
-            if(event.target.value === currentSlice)
+        if(this.state.typingState === conditions.typing)
+        {
+            // If the length of current input with mistake is longer than length of correct keys, do not allow user to continue typing until mistake is fixed.
+            if(event.target.value.length < this.state.correctKeys.length + 10)
             {
-                this.setState({
-                    correctKeys: event.target.value,
-                    highlight: [0, 0]
-                })
+                this.setState({input: event.target.value})
+
+                const currentSlice = this.state.codeText.slice(0,event.target.value.length);
+
+                if(event.target.value === currentSlice)
+                {
+                    this.state.correctKeys = event.target.value
+                    this.setState({
+                        highlight: [0, 0]
+                    })
+                }
+                else
+                {
+                    this.setState({
+                        highlight: [this.state.correctKeys.length, event.target.value.length]
+                    })
+                }
+
+                this.state.totalKeysCount++
+
+                console.log('Correct Keys: ' + this.state.correctKeys.length)
+                console.log('Total Keys: ' + this.state.totalKeysCount)
+
+                this.showResults()
             }
-            else
+
+            if(this.state.codeText === event.target.value) // Text fully typed out correctly. Stop timer.
             {
-                this.setState({
-                    highlight: [this.state.correctKeys.length, event.target.value.length]
-                })
+                this.state.typingState = conditions.finished
+                this.showResults()
+                return;
             }
         }
-        
     }
 
     handleKeyDown = (event) => {
+        /*
+        let value = this.state.input,
+        selStartPos = event.target.selectionStart;
 
+        console.log(event.target);
+
+        // handle 4-space indent on
+        if (event.key === "Tab") {
+        value =
+            value.substring(0, selStartPos) +
+            "    " +
+            value.substring(selStartPos, value.length);
+        event.target.selectionStart = selStartPos + 3;
+        event.target.selectionEnd = selStartPos + 4;
+        event.preventDefault();
+
+        this.handleChange(event)
+        }
+        */
+
+        if(event.key === 'Backspace' || event.key === 'Delete') {
+            //console.log('delete')
+
+            if(this.state.totalKeysCount > 0 && this.state.totalKeysCount >= this.state.correctKeys.length)
+                this.state.totalKeysCount--
+        }
     }
 
     showResults = () => {
-        console.log("All words typed out. Showing results.")
+        //console.log("All words typed out. Showing results.")
         let words, minute, acc
 
-        words = this.state.correctKeys / 5
+        words = this.state.correctKeys.length / 5
         minute = (Date.now() - this.state.startDate) / 1000 / 60
-        let totalKeys = -1
-        this.state.wordList.forEach(word => {
-            totalKeys += word.length + 1
-        });
-        acc = Math.floor((this.state.correctKeys / totalKeys) * 100)
+
+        acc = Math.floor((this.state.correctKeys.length / this.state.totalKeysCount) * 100)
 
         let wpm = Math.floor(words / minute)
 
@@ -108,27 +152,9 @@ const something = 10;`
     }
 
     render() {
-        const textDisplay = this.state.textDisplay
         const inputClass = this.state.inputClass
         const input = this.state.input
         const results = this.state.results
-
-        const defaultCodeEditor = 
-        <textarea 
-        id="input-field" 
-        value={input}
-        onChange={this.handleChange} 
-        onKeyDown={this.handleChange}
-        type="text" 
-        spellCheck="false" 
-        autoComplete="off" 
-        autoCorrect="off" 
-        autoCapitalize="off"
-        tabIndex="1" 
-        className={inputClass} 
-        style={{direction: 'ltr'}}
-        >
-        </textarea>
 
         return (
             <div id="command-center">
@@ -144,10 +170,11 @@ const something = 10;`
                     <div className="column">
                         <CodeBlock 
                             language="java"
-                            text={this.state.sampleText}
+                            text={this.state.codeText}
                             showLineNumbers={true}
                             theme={dracula}
                             wrapLines={true}
+                            style={{background: 'transparent'}}
                         />
                     </div>
                     <div className="column">
@@ -155,8 +182,9 @@ const something = 10;`
                             value={input}
                             highlight={this.state.highlight}
                             onChange={this.handleChange}
+                            onKeyDown={this.handleKeyDown}
                             containerClassName="highlighttext-within-textarea"
-
+                            
                             id="input-field"
                             spellCheck="false" 
                             autoComplete="off" 
@@ -175,25 +203,15 @@ const something = 10;`
     }
 }
 
-const codeStyle = {
-    padding: '8px',
-    fontSize: 'inherit',
-    fontFamily: 'inherit',
-    lineHight: 1.42857,
-    color: 'white',
-    whiteSpace: 'pre'
-}
+const highlightTextAreaContainerStyle = {
+    width: '100%',
+    height: '100%',
+    border: 'none',
+    padding: '8px 0px 8px 10px',
+    borderRadius: '0.2rem',
+    resize: 'none',
 
-const codeBlock = {
-    fontSize: 'inherit',
-    fontFamily: 'inherit',
-    background: 'rgb(40, 42, 54)',
-    color: 'rgb(248, 248, 242)',
-    borderRadius: '3px',
-    display: 'flex',
-    lineHeight: 1.42857,
-    overflowX: 'auto',
-    whiteSpace: 'pre'
+    background: '#2c2e40'
 }
 
 export default CodeTyper
