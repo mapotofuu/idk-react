@@ -17,7 +17,7 @@ class CodeTyper extends Component {
         input: '',
         correctKeys: '',
         totalKeysCount: 0,
-        highlight: [0, 5],
+        highlight: [0, 0],
         currentWord: 0,
         inputClass: "",
         results: "WPM: XX / ACC: XX",
@@ -37,6 +37,7 @@ class CodeTyper extends Component {
         this.state.currentWord = 0
         this.state.correctKeys = ''
         this.state.totalKeysCount = 0
+        this.state.highlight = [0, 0]
         this.state.typingState = conditions.notStarted
         
         // Split text by punctations and whitespaces
@@ -47,6 +48,7 @@ class CodeTyper extends Component {
         this.setState({
             input: '',
             inputClass: '',
+            results: "WPM: XX / ACC: XX",
         })
     }
 
@@ -100,32 +102,38 @@ class CodeTyper extends Component {
     }
 
     handleKeyDown = (event) => {
-        /*
+        // Cursor should always be set after the last letter of string.
+        event.target.selectionStart = this.state.input.length + 1
+        event.target.selectionEnd = this.state.input.length + 1
+
         let value = this.state.input,
         selStartPos = event.target.selectionStart;
 
-        console.log(event.target);
-
-        // handle 4-space indent on
+        // handle 2-space indent on
         if (event.key === "Tab") {
-        value =
-            value.substring(0, selStartPos) +
-            "    " +
-            value.substring(selStartPos, value.length);
-        event.target.selectionStart = selStartPos + 3;
-        event.target.selectionEnd = selStartPos + 4;
-        event.preventDefault();
+            value =
+                value.substring(0, selStartPos) +
+                "  " +
+                value.substring(selStartPos, value.length);
+            event.target.selectionStart = selStartPos + 1;
+            event.target.selectionEnd = selStartPos + 2;
+            event.preventDefault();
 
-        this.handleChange(event)
+            this.setState({
+                input: value
+            });
         }
-        */
-
+        
         if(event.key === 'Backspace' || event.key === 'Delete') {
-            //console.log('delete')
-
             if(this.state.totalKeysCount > 0 && this.state.totalKeysCount >= this.state.correctKeys.length)
                 this.state.totalKeysCount--
         }
+    }
+
+    handleKeyUp = (event) => {
+        // Cursor should always be set after the last letter of string.
+        event.target.selectionStart = this.state.input.length + 1
+        event.target.selectionEnd = this.state.input.length + 1
     }
 
     showResults = () => {
@@ -174,7 +182,9 @@ class CodeTyper extends Component {
                             showLineNumbers={true}
                             theme={dracula}
                             wrapLines={true}
-                            style={{background: 'transparent'}}
+                            //codeContainerStyle={{background: 'black'}}
+                            //highlight={"1"}
+                            customStyle={{background: 'transparent'}}
                         />
                     </div>
                     <div className="column">
@@ -183,6 +193,7 @@ class CodeTyper extends Component {
                             highlight={this.state.highlight}
                             onChange={this.handleChange}
                             onKeyDown={this.handleKeyDown}
+                            onKeyUp={this.handleKeyUp}
                             containerClassName="highlighttext-within-textarea"
                             
                             id="input-field"
