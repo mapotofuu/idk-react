@@ -16,6 +16,7 @@ class CodeTyper extends Component {
         wordList: [""],
         input: '',
         correctKeys: '',
+        wrongKeys: '',
         totalKeysCount: 0,
         highlight: [0, 0],
         currentWord: 0,
@@ -36,6 +37,7 @@ class CodeTyper extends Component {
         this.state.wordList = []
         this.state.currentWord = 0
         this.state.correctKeys = ''
+        this.state.wrongKeys = ''
         this.state.totalKeysCount = 0
         this.state.highlight = [0, 0]
         this.state.typingState = conditions.notStarted
@@ -68,19 +70,23 @@ class CodeTyper extends Component {
             {
                 this.setState({input: event.target.value})
 
-                const currentSlice = this.state.codeText.slice(0,event.target.value.length);
+                const currentSlice = this.state.codeText.slice(0,event.target.value.length)
 
-                if(event.target.value === currentSlice)
+                if(event.target.value === currentSlice) // correct
                 {
                     this.state.correctKeys = event.target.value
                     this.setState({
-                        highlight: [0, 0]
+                        highlight: [0, 0],
+                        wrongKeys: ''
                     })
                 }
-                else
+                else // wrong
                 {
+                    const wrong = this.state.codeText.slice(this.state.correctKeys.length, event.target.value.length)
+
                     this.setState({
-                        highlight: [this.state.correctKeys.length, event.target.value.length]
+                        highlight: [this.state.correctKeys.length, event.target.value.length],
+                        wrongKeys: wrong
                     })
                 }
 
@@ -176,16 +182,24 @@ class CodeTyper extends Component {
                 </div>
                 <div id="typing-area" className="row">
                     <div className="column">
-                        <CodeBlock 
-                            language="java"
-                            text={this.state.codeText}
-                            showLineNumbers={true}
-                            theme={dracula}
-                            wrapLines={true}
-                            //codeContainerStyle={{background: 'black'}}
-                            //highlight={"1"}
-                            customStyle={{background: 'transparent'}}
-                        />
+                        <div className="container">
+                            <div className="backdrop">
+                                <div className="highlights">
+                                    <span>{this.state.correctKeys}</span>
+                                    <mark>{this.state.wrongKeys}</mark>
+                                </div>
+                            </div>
+                            <CodeBlock 
+                                language="java"
+                                text={this.state.codeText}
+                                showLineNumbers={true}
+                                theme={dracula}
+                                wrapLines={true}
+                                //codeContainerStyle={{background: 'black'}}
+                                //highlight={"1"}
+                                //customStyle={{background: 'transparent'}}
+                            />
+                        </div>
                     </div>
                     <div className="column">
                         <HighlightWithinTextarea
