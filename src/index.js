@@ -6,4 +6,12 @@ import './style.css'
 import TextTyper from './TextTyper'
 import CodeTyper from './CodeTyper'
 
-ReactDOM.render(<CodeTyper />, document.getElementById('root'))
+const language = 'java'
+const codeText = 
+`class HelloWorld {
+  static public void main( String args[] ) {
+    System.out.println( "Hello World!" );
+  }
+}`
+
+ReactDOM.render(<CodeTyper language={language} codeText={codeText}/>, document.getElementById('root'))

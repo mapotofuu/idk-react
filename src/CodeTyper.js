@@ -12,29 +12,23 @@ const conditions = {
 }
 
 class CodeTyper extends Component {
+     // Language and codeText part of props.
     state = {
-        wordList: [""],
+        //wordList: [""],
         input: '',
         correctKeys: '',
         wrongKeys: '',
         totalKeysCount: 0,
         highlight: [0, 0],
         currentWord: 0,
-        inputClass: "",
         results: "WPM: XX / ACC: XX",
         startDate: 0,
         typingState: '',
-        codeText: 
-`class HelloWorld {
-  static public void main( String args[] ) {
-    System.out.println( "Hello World!" );
-  }
-}`
     }
 
     setText = () => {
         // Reset values
-        this.state.wordList = []
+        //this.state.wordList = []
         this.state.currentWord = 0
         this.state.correctKeys = ''
         this.state.wrongKeys = ''
@@ -45,11 +39,10 @@ class CodeTyper extends Component {
         // Split text by punctations and whitespaces
         // [\w-]+ means any word/letters including '-'
         // [^\w\s] means any characters that are not words/letters or whitespaces, so any remaining punctuations.
-        this.state.wordList = this.state.codeText.match(/[\w-]+|[^\w\s]/g)
+        //this.state.wordList = this.state.codeText.match(/[\w-]+|[^\w\s]/g)
         
         this.setState({
             input: '',
-            inputClass: '',
             results: "WPM: XX / ACC: XX",
         })
     }
@@ -70,7 +63,7 @@ class CodeTyper extends Component {
             {
                 this.setState({input: event.target.value})
 
-                const currentSlice = this.state.codeText.slice(0,event.target.value.length)
+                const currentSlice = this.props.codeText.slice(0,event.target.value.length)
 
                 if(event.target.value === currentSlice) // correct
                 {
@@ -82,7 +75,7 @@ class CodeTyper extends Component {
                 }
                 else // wrong
                 {
-                    const wrong = this.state.codeText.slice(this.state.correctKeys.length, event.target.value.length)
+                    const wrong = this.props.codeText.slice(this.state.correctKeys.length, event.target.value.length)
 
                     this.setState({
                         highlight: [this.state.correctKeys.length, event.target.value.length],
@@ -98,7 +91,7 @@ class CodeTyper extends Component {
                 this.showResults()
             }
 
-            if(this.state.codeText === event.target.value) // Text fully typed out correctly. Stop timer.
+            if(this.props.codeText === event.target.value) // Text fully typed out correctly. Stop timer.
             {
                 this.state.typingState = conditions.finished
                 this.showResults()
@@ -166,18 +159,13 @@ class CodeTyper extends Component {
     }
 
     render() {
-        const inputClass = this.state.inputClass
         const input = this.state.input
         const results = this.state.results
 
         return (
             <div id="command-center">
                 <div className='bar'>
-                    <div id="left-wing">
-                        <span id="word-count" style={{display: 'inline'}}>
-                            <span id="wc-10" style={{cursor: 'pointer'}} onClick={() => this.clickedOn()}>Java</span>
-                        </span>
-                    </div>
+                    <div id="left-wing">{this.state.language}</div>
                     <div id="right-wing">{results}</div>
                 </div>
                 <div id="typing-area" className="row">
@@ -190,14 +178,14 @@ class CodeTyper extends Component {
                                 </div>
                             </div>
                             <CodeBlock 
-                                language="java"
-                                text={this.state.codeText}
+                                language={this.props.language}
+                                text={this.props.codeText}
                                 showLineNumbers={true}
                                 theme={dracula}
                                 wrapLines={true}
                                 //codeContainerStyle={{background: 'black'}}
                                 //highlight={"1"}
-                                //customStyle={{background: 'transparent'}}
+                                customStyle={{background: 'transparent'}}
                             />
                         </div>
                     </div>
@@ -216,7 +204,6 @@ class CodeTyper extends Component {
                             autoCorrect="off" 
                             autoCapitalize="off"
                             tabIndex="1" 
-                            className={inputClass} 
                             style={{direction: 'ltr'}}
                             placeholder="Start typing!"
                         />
