@@ -11,7 +11,7 @@ const conditions = {
     finished: 'finished'
 }
 
-class CodeTyper extends Component {
+class CodeTyper2 extends Component {
      // Language and codeText part of props.
     state = {
         //wordList: [""],
@@ -78,18 +78,19 @@ class CodeTyper extends Component {
                 }
                 else // wrong
                 {
-                    const wrong = this.props.codeText.slice(this.state.correctKeys.length, event.target.value.length)
+                    //const wrong = this.props.codeText.slice(this.state.correctKeys.length, event.target.value.length)
+                    const wrong = event.target.value.slice(this.state.correctKeys.length, event.target.value.length)
 
                     this.setState({
                         highlight: [this.state.correctKeys.length, event.target.value.length],
-                        wrongKeys: wrong
+                        wrongKeys: wrong,
                     })
                 }
 
                 this.state.totalKeysCount++
 
-                console.log('Correct Keys: ' + this.state.correctKeys.length)
-                console.log('Total Keys: ' + this.state.totalKeysCount)
+                //console.log('Correct Keys: ' + this.state.correctKeys.length)
+                //console.log('Total Keys: ' + this.state.totalKeysCount)
 
                 this.showResults()
             }
@@ -203,45 +204,73 @@ class CodeTyper extends Component {
                     <div id="right-wing">{results}</div>
                 </div>
                 <div id="typing-area" className="row">
-                    <div className="column">
-                        <div className="container">
+                    
+                        <div className="container " style={{width: '100%', minHeight: '20rem'}}>
                             <div className="backdrop">
                                 <div className="highlights">
                                     <span>{this.state.correctKeys}</span>
                                     <mark>{this.state.wrongKeys}</mark>
                                 </div>
                             </div>
+
+                            <div className="backdrop">
+                                <textarea
+                                    value={input}
+                                    spellCheck="false" 
+                                    autoComplete="off" 
+                                    autoCorrect="off" 
+                                    autoCapitalize="off" 
+                                    onChange={this.handleChange}
+                                    onKeyDown={this.handleKeyDown}
+                                    onKeyUp={this.handleKeyUp}
+                                    style={{
+                                        background: 'transparent', 
+                                        width: '100%', 
+                                        height: '100%', 
+                                        resize: 'none', 
+                                        pointerEvents: 'auto',
+                                        fontSize: 'inherit',
+                                        fontFamily: 'inherit',
+                                        lineHeight: '1.66667',
+                                        padding: '8px 8px 0px 34px',
+                                        caretColor: 'white',
+                                        color: 'transparent'
+                                    }}
+                                />
+                            </div>
+
+                            <div className="backdrop"
+                                style={{
+                                    background: 'transparent', 
+                                    width: '100%', 
+                                    height: '100%', 
+                                    resize: 'none', 
+                                    pointerEvents: 'none',
+                                    fontSize: 'inherit',
+                                    fontFamily: 'inherit',
+                                    lineHeight: '1.66667',
+                                    padding: '8px 8px 0px 38px',
+                                    color: 'white',
+                                    //opacity: '0.5',
+                                    whiteSpace: 'pre'
+                                }}
+                            >
+                                <span style={{opacity: '0.5'}}>{this.props.codeText}</span>
+                            </div>
+
                             <CodeBlock 
                                 language={this.props.language}
-                                text={this.props.codeText}
+                                //text={this.props.codeText}
+                                text={this.state.input}
                                 showLineNumbers={true}
                                 theme={dracula}
                                 wrapLines={true}
                                 //codeContainerStyle={{background: 'black'}}
                                 //highlight={"1"}
-                                customStyle={{background: 'transparent'}}
+                                customStyle={{background: 'transparent', pointerEvents: 'none'}}
                             />
                         </div>
-                    </div>
-                    <div className="column">
-                        <HighlightWithinTextarea
-                            value={input}
-                            highlight={this.state.highlight}
-                            onChange={this.handleChange}
-                            onKeyDown={this.handleKeyDown}
-                            onKeyUp={this.handleKeyUp}
-                            containerClassName="highlighttext-within-textarea"
-                            
-                            id="input-field"
-                            spellCheck="false" 
-                            autoComplete="off" 
-                            autoCorrect="off" 
-                            autoCapitalize="off"
-                            tabIndex="1" 
-                            style={{direction: 'ltr'}}
-                            placeholder="Start typing!"
-                        />
-                    </div>
+                    
                 </div>
                 <button id="redo-button" onClick={this.setText} tabIndex="2">redo</button>
             </div>
@@ -260,4 +289,4 @@ const highlightTextAreaContainerStyle = {
     background: '#2c2e40'
 }
 
-export default CodeTyper
+export default CodeTyper2

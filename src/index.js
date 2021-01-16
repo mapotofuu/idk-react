@@ -2,9 +2,8 @@ import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 //import './index.css'
 import './style.css'
-//import App from './App'
-import TextTyper from './TextTyper'
-import CodeTyper from './CodeTyper'
+import App from './App'
+//import CodeTyper from './CodeTyper'
 
 const language = 'java'
 const codeText = 
@@ -14,4 +13,5 @@ const codeText =
   }
 }`
 
-ReactDOM.render(<CodeTyper language={language} codeText={codeText}/>, document.getElementById('root'))
+//ReactDOM.render(<CodeTyper language={language} codeText={codeText}/>, document.getElementById('root'))
+ReactDOM.render(<App/>, document.getElementById('root'))

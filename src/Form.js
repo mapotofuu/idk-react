@@ -2,8 +2,11 @@ import React, {Component} from 'react'
 
 class Form extends Component {
     initialState = {
+        number: '',
         name: '',
-        job: '',
+        wpm: '',
+        time: '',
+        acc: '',
     }
 
     state = this.initialState
@@ -22,24 +25,50 @@ class Form extends Component {
     }
 
     render() {
-        const {name, job} = this.state;
+        const {number, name, wpm, time, acc} = this.state;
 
         return (
             <form>
+                <label htmlFor="#">#</label>
+                <input
+                    type="text"
+                    name="number"
+                    id="number"
+                    value={number}
+                    onChange={this.handleChange} /> 
+
                 <label htmlFor="name">Name</label>
                 <input
                     type="text"
                     name="name"
                     id="name"
                     value={name}
-                    onChange={this.handleChange} /> 
-                <label htmlFor="job">Job</label>
+                    onChange={this.handleChange} />
+                    
+                <label htmlFor="wpm">WPM</label>
                 <input
                     type="text"
-                    name="job"
-                    id="job"
-                    value={job}
+                    name="wpm"
+                    id="wpm"
+                    value={wpm}
                     onChange={this.handleChange} />
+                
+                <label htmlFor="time">Time</label>
+                <input
+                    type="text"
+                    name="time"
+                    id="time"
+                    value={time}
+                    onChange={this.handleChange} />
+                
+                <label htmlFor="acc">Accuracy</label>
+                <input
+                    type="text"
+                    name="acc"
+                    id="acc"
+                    value={acc}
+                    onChange={this.handleChange} />
+                    
                 <input type="button" value="Submit" onClick={this.submitForm} /> 
             </form>
         )
