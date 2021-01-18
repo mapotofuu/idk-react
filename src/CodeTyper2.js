@@ -66,26 +66,7 @@ class CodeTyper2 extends Component {
             {
                 this.setState({input: event.target.value})
 
-                const currentSlice = this.props.codeText.slice(0,event.target.value.length)
-
-                if(event.target.value === currentSlice) // correct
-                {
-                    this.state.correctKeys = event.target.value
-                    this.setState({
-                        highlight: [0, 0],
-                        wrongKeys: ''
-                    })
-                }
-                else // wrong
-                {
-                    //const wrong = this.props.codeText.slice(this.state.correctKeys.length, event.target.value.length)
-                    const wrong = event.target.value.slice(this.state.correctKeys.length, event.target.value.length)
-
-                    this.setState({
-                        highlight: [this.state.correctKeys.length, event.target.value.length],
-                        wrongKeys: wrong,
-                    })
-                }
+                this.checkCorrect(event.target.value)
 
                 this.state.totalKeysCount++
 
@@ -131,6 +112,8 @@ class CodeTyper2 extends Component {
             this.setState({
                 input: value
             });
+
+            this.checkCorrect(value)
         }
         
         if(event.key === 'Backspace' || event.key === 'Delete') {
@@ -143,6 +126,29 @@ class CodeTyper2 extends Component {
         // Cursor should always be set after the last letter of string.
         event.target.selectionStart = this.state.input.length + 1
         event.target.selectionEnd = this.state.input.length + 1
+    }
+
+    checkCorrect = (value) => {
+        const currentSlice = this.props.codeText.slice(0,value.length)
+
+        if(value === currentSlice) // correct
+        {
+            this.state.correctKeys = value
+            this.setState({
+                highlight: [0, 0],
+                wrongKeys: ''
+            })
+        }
+        else // wrong
+        {
+            //const wrong = this.props.codeText.slice(this.state.correctKeys.length, event.target.value.length)
+            const wrong = value.slice(this.state.correctKeys.length, value.length)
+
+            this.setState({
+                highlight: [this.state.correctKeys.length, value.length],
+                wrongKeys: wrong,
+            })
+        }
     }
 
     showResults = () => {
