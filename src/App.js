@@ -37,7 +37,7 @@ class App extends Component {
         console.log("All words typed out. Showing results.")
 
         const wpm = score.wpm
-        const time = score.time + " minutes"
+        const time = score.time
         const acc = score.acc + "%"
 
         this.setState({

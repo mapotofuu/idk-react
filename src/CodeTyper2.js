@@ -1,3 +1,4 @@
+import { NONAME } from 'dns';
 import React, {Component} from 'react'
 
 // Components
@@ -26,6 +27,7 @@ class CodeTyper2 extends Component {
         typingState: '',
 
         time: '',
+        inputField: React.createRef()
     }
 
     setText = () => {
@@ -81,10 +83,7 @@ class CodeTyper2 extends Component {
                 this.state.typingState = conditions.finished
                 this.showResults()
 
-                // TEST
                 this.submitScore()
-
-                return;
             }
         }
     }
@@ -199,9 +198,33 @@ class CodeTyper2 extends Component {
         this.setText()
     }
 
+    handleFocus = () =>
+    {
+        this.state.inputField.current.focus()
+    }
+
     render() {
         const input = this.state.input
         const results = this.state.results
+
+        const pastOutline = 
+        <div className="backdrop"
+            style={{
+                background: 'transparent', 
+                width: '100%', 
+                height: '100%', 
+                resize: 'none', 
+                pointerEvents: 'none',
+                fontSize: 'inherit',
+                fontFamily: 'inherit',
+                lineHeight: '1.66667',
+                padding: '8px 8px 0px 38px',
+                color: 'white',
+                //opacity: '0.5',
+                whiteSpace: 'pre'
+            }} >
+            <span style={{opacity: '0.5'}}>{this.props.codeText}</span>
+        </div>
 
         return (
             <div id="command-center">
@@ -211,7 +234,7 @@ class CodeTyper2 extends Component {
                 </div>
                 <div id="typing-area" className="row">
                     
-                        <div className="container " style={{width: '100%', minHeight: '20rem'}}>
+                        <div className="container" onClick={this.handleFocus}>
                             <div className="backdrop">
                                 <div className="highlights">
                                     <span>{this.state.correctKeys}</span>
@@ -221,6 +244,7 @@ class CodeTyper2 extends Component {
 
                             <div className="backdrop">
                                 <textarea
+                                    ref={this.state.inputField}
                                     value={input}
                                     spellCheck="false" 
                                     autoComplete="off" 
@@ -238,31 +262,24 @@ class CodeTyper2 extends Component {
                                         fontSize: 'inherit',
                                         fontFamily: 'inherit',
                                         lineHeight: '1.66667',
-                                        padding: '8px 8px 0px 34px',
+                                        padding: '8px 0px 0px 38px',
                                         caretColor: 'white',
-                                        color: 'transparent'
+                                        color: 'transparent',
+                                        outline: 'none',
+                                        border: 'none'
                                     }}
                                 />
                             </div>
-
-                            <div className="backdrop"
-                                style={{
-                                    background: 'transparent', 
-                                    width: '100%', 
-                                    height: '100%', 
-                                    resize: 'none', 
-                                    pointerEvents: 'none',
-                                    fontSize: 'inherit',
-                                    fontFamily: 'inherit',
-                                    lineHeight: '1.66667',
-                                    padding: '8px 8px 0px 38px',
-                                    color: 'white',
-                                    //opacity: '0.5',
-                                    whiteSpace: 'pre'
-                                }}
-                            >
-                                <span style={{opacity: '0.5'}}>{this.props.codeText}</span>
-                            </div>
+                            <CodeBlock
+                                language={this.props.language}
+                                text={this.props.codeText}
+                                showLineNumbers={true}
+                                theme={dracula}
+                                wrapLines={true}
+                                //codeContainerStyle={{background: 'black'}}
+                                //highlight={"1"}
+                                customStyle={{background: 'transparent', pointerEvents: 'none', opacity: "40%", position: "absolute"}}
+                            />
 
                             <CodeBlock 
                                 language={this.props.language}
@@ -276,7 +293,6 @@ class CodeTyper2 extends Component {
                                 customStyle={{background: 'transparent', pointerEvents: 'none'}}
                             />
                         </div>
-                    
                 </div>
                 <button id="redo-button" onClick={this.setText} tabIndex="2">redo</button>
             </div>

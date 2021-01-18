@@ -186,16 +186,18 @@ body, #header, #left-wing, #right-wing, #typing-area, #theme-area, #theme-center
 */
 
 .container {
+  width: 100%; 
+  min-height: 20rem;
   display: block;
   margin: 0 auto;
   transform: translateZ(0);
   -webkit-text-size-adjust: none;
   background: rgb(40, 42, 54);
+  overflow: auto;
 }
 
 .highlights{
-  /*padding: 8px 8px 0px 34px;*/
-  padding: 8px 8px 0px 38px;
+  padding: 8px 0px 0px 38px;
   font-size: inherit;
   font-family: inherit;
   line-height: 1.66667;
@@ -210,7 +212,7 @@ body, #header, #left-wing, #right-wing, #typing-area, #theme-area, #theme-center
   z-index: -1;
   /*border: 2px solid #685972;*/
   /*background-color: #fff;*/
-  overflow: auto;
+  overflow: none;
   pointer-events: none;
   transition: transform 1s;
   
